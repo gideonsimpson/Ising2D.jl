@@ -1,6 +1,16 @@
-using Printf
 
-function SpinFlipMCMC(x0, β, niters; J=1.0)
+"""
+`Metropolis` - Sample Ising on a N×N square lattice with spin flip proposals
+and Metropolis rates
+
+### Fields
+* `x0` - Initial of the lattice
+* `β` - Inverse temperature
+* `niters` - Number of iterations to run
+### Optional Fields
+* 'J=1.0' - Coupling constant>0
+"""
+function Metropolis(x0, β, niters; J=1.0)
 
     N = size(x0)[1];
     x = copy(x0);
@@ -52,7 +62,18 @@ function SpinFlipMCMC(x0, β, niters; J=1.0)
     return x_trajectory
 end
 
-function SpinFlipMCMC!(x, β, niters; J=1.0)
+"""
+`Metropolis!` - Sample Ising on a N×N square lattice with spin flip proposals
+and Metropolis rates.  This is the in place version.
+
+### Fields
+* `x` - State of the lattice
+* `β` - Inverse temperature
+* `niters` - Number of iterations to run
+### Optional Fields
+* 'J=1.0' - Coupling constant>0
+"""
+function Metropolis!(x, β, niters; J=1.0)
 
     N = size(x)[1];
     xp = copy(x)

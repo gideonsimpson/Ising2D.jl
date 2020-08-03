@@ -4,7 +4,8 @@
 
 E = -0.5 * J ∑ xᵢxⱼ
 
-over a periodic N×N square lattice.
+over a periodic N×N square lattice.  Note that this counts each bond twice,
+hence the factor of 0.5
 
 ### Fields
 * `x` - State of the lattice
@@ -39,7 +40,7 @@ end
 
 
 """
-`Magnetization` - Compute the mean magnetization
+`Magnetization` - Compute the magnetization
 
 M = ∑ xᵢ
 
@@ -49,6 +50,6 @@ over a periodic N×N square lattice.
 * `x` - State of the lattice
 """
 function Magnetization(x)
-    M = mean(x);
+    M = sum(x);
     return M
 end

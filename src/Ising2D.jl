@@ -10,8 +10,8 @@ export Energy, Magnetization
 include("Utils2d.jl")
 export RandomLattice
 
-# spin flip sampler
-include("samplers/SpinFlip2D.jl")
-export SpinFlipMCMC, SpinFlipMCMC!
+# spin flip sampler with Metropolis rates
+include("samplers/Metropolis2D.jl")
+export Metropolis, Metropolis!
 
 end # module end
