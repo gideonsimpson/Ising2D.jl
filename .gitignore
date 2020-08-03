@@ -32,3 +32,6 @@ Manifest.toml
 
 # graphics
 *.gif
+
+# scratch folder
+scratch/*
