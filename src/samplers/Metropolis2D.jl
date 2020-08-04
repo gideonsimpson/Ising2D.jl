@@ -20,6 +20,8 @@ function Metropolis(x0, β, niters; J=1.0)
 
     E = Energy(x, J = J);
 
+    𝒩 = [zeros(MVector{2,Int8}) for _ in 1:4];
+
     for n in 1:niters
         i = rand(1:N);
         j = rand(1:N);
@@ -27,22 +29,10 @@ function Metropolis(x0, β, niters; J=1.0)
 
         # compute local energy contribution
         e = 0.0;
-
-        k = mod1(i+1,N);
-        l = j;
-        e += - 0.5 * J * xp[i,j] * xp[k,l];
-
-        k = mod1(i-1,N);
-        l = j;
-        e += - 0.5 * J * xp[i,j] * xp[k,l];
-
-        k = i
-        l = mod1(j+1,N);;
-        e += - 0.5 * J * xp[i,j] * xp[k,l];
-
-        k = i
-        l = mod1(j-1,N);
-        e += - 0.5 * J * xp[i,j] * xp[k,l];
+        GetNeighbors!(𝒩, i, j, N);
+        for (k,l) in 𝒩
+            e += - 0.5 * J * xp[i,j] * xp[k,l];
+        end
 
         # double once for double counting of bonds and again for the sign change
         ΔE = 2 * 2 * e;
@@ -80,6 +70,8 @@ function Metropolis!(x, β, niters; J=1.0)
 
     E = Energy(x, J = J);
 
+    𝒩 = [zeros(MVector{2,Int8}) for _ in 1:4];
+
     for n in 1:niters
         i = rand(1:N);
         j = rand(1:N);
@@ -87,22 +79,10 @@ function Metropolis!(x, β, niters; J=1.0)
 
         # compute local energy contribution
         e = 0.0;
-
-        k = mod1(i+1,N);
-        l = j;
-        e += - 0.5 * J * xp[i,j] * xp[k,l];
-
-        k = mod1(i-1,N);
-        l = j;
-        e += - 0.5 * J * xp[i,j] * xp[k,l];
-
-        k = i
-        l = mod1(j+1,N);;
-        e += - 0.5 * J * xp[i,j] * xp[k,l];
-
-        k = i
-        l = mod1(j-1,N);
-        e += - 0.5 * J * xp[i,j] * xp[k,l];
+        GetNeighbors!(𝒩, i, j, N);
+        for (k,l) in 𝒩
+            e += - 0.5 * J * xp[i,j] * xp[k,l];
+        end
 
         # double once for double counting of bonds and again for the sign change
         ΔE = 2 * 2 * e;

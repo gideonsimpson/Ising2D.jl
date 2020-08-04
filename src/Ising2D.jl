@@ -1,5 +1,6 @@
 module Ising2D
 
+using StaticArrays
 using Statistics
 
 # observables, including energy
