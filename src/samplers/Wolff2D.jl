@@ -77,7 +77,7 @@ function Wolff!(x, β, niters; J = 1.0)
 
     p = 1 - exp(-2 * β * J);
 
-    N = size(x0)[1];
+    N = size(x)[1];
 
     for n in 1:niters
         i = rand(1:N);
