@@ -1,128 +1,77 @@
-"""
-`Wolff` - Sample Ising on a N×N square lattice with the Wolff cluster algorithm
-
-### Fields
-* `x0` - Initial state of the lattice
-* `β` - Inverse temperature
-* `niters` - Number of iterations to run
-### Optional Fields
-* 'J = 1.0' - Coupling constant>0
-* `nsave_iters = 1` - Number of iterations between saves
-"""
-function Wolff(x0, β, niters; J = 1.0, nsave_iters=1)
-
-    p = 1 - exp(-2 * β * J);
-
-    N = size(x0)[1];
-    x = copy(x0);
-
-    x_trajectory = typeof(x0)[];
-
-    for n in 1:niters
-        i = rand(1:N);
-        j = rand(1:N);
-
-        D = x[i,j];
-        x[i,j] *=-1;
-
-        k,l = mod1(i+1,N), j;
-        if (x[k,l]==D)
-            if (rand() < p)
-                x[k,l] *=-1;
-                FlipNeighbors!(x, k, l, p, D, N)
-            end
-        end
-
-        k,l = mod1(i-1,N), j;
-        if (x[k,l]==D)
-            if (rand() < p)
-                x[k,l] *=-1;
-                FlipNeighbors!(x, k, l, p, D, N)
-            end
-        end
-
-        k,l = i, mod1(j+1,N);
-        if (x[k,l]==D)
-            if (rand() < p)
-                x[k,l] *=-1;
-                FlipNeighbors!(x, k, l, p, D, N)
-            end
-        end
-
-        k,l = i, mod1(j-1,N);
-        if (x[k,l]==D)
-            if (rand() < p)
-                x[k,l] *=-1;
-                FlipNeighbors!(x, k, l, p, D, N)
-            end
-        end
-        if(mod(n,nsave_iters) == 0)
-            push!(x_trajectory,copy(x));
-        end
-    end
-
-    return x_trajectory
+struct Wolff{TF<:AbstractFloat, TI<:Integer} <:AbstractSampler
+    β::TF
+    J::TF
+    L::TI
+    p::TF
 end
 
 """
-`Wolff!` - Sample Ising on a N×N square lattice with the Wolff cluster
-algorithm.  In place version.
+    `Wolff(β, J, L)` - Set up the Wolff sampler
 
 ### Fields
-* `x` - State of the lattice
 * `β` - Inverse temperature
-* `niters` - Number of iterations to run
-### Optional Fields
-* 'J=1.0' - Coupling constant>0
+* `J` - Coupling constant>0    
+* `L` - Lattice size, L×L
 """
-function Wolff!(x, β, niters; J = 1.0)
+function Wolff(β::TF, J::TF, L::TI) where{TF<:AbstractFloat, TI<:Integer}
+    return Wolff{TF, TI}(β, J, L, 1 - exp(-2 * β * J))
+end
 
-    p = 1 - exp(-2 * β * J);
 
-    N = size(x)[1];
+mutable struct WolffState{TI<:Integer, Tx<:AbstractArray{TI}} <:AbstractSamplerState
+    x::Tx
+    D::TI
+end
 
-    for n in 1:niters
-        i = rand(1:N);
-        j = rand(1:N);
+function InitState!(x, sampler::Wolff)
 
-        D = x[i,j];
-        x[i,j] *=-1;
+    return WolffState(x, zero(eltype(x)));
+end
 
-        k,l = mod1(i+1,N), j;
-        if (x[k,l]==D)
-            if (rand() < p)
-                x[k,l] *=-1;
-                FlipNeighbors!(x, k, l, p, D, N)
-            end
+function InitState(x₀, sampler::Wolff)
+
+    return WolffState(deepcopy(x₀),zero(eltype(x₀)));
+end
+
+function UpdateState!(state::WolffState, sampler::Wolff)
+
+    i = rand(1:sampler.L);
+    j = rand(1:sampler.L);
+    state.D = state.x[i,j];
+    state.x[i,j] *=-1;
+
+    k,l = mod1(i+1,sampler.L), j;
+    if (state.x[k,l]==state.D)
+        if (rand() < sampler.p)
+            state.x[k,l] *=-1;
+            FlipNeighbors!(state.x, k, l, sampler.p, state.D, sampler.L)
         end
-
-        k,l = mod1(i-1,N), j;
-        if (x[k,l]==D)
-            if (rand() < p)
-                x[k,l] *=-1;
-                FlipNeighbors!(x, k, l, p, D, N)
-            end
-        end
-
-        k,l = i, mod1(j+1,N);
-        if (x[k,l]==D)
-            if (rand() < p)
-                x[k,l] *=-1;
-                FlipNeighbors!(x, k, l, p, D, N)
-            end
-        end
-
-        k,l = i, mod1(j-1,N);
-        if (x[k,l]==D)
-            if (rand() < p)
-                x[k,l] *=-1;
-                FlipNeighbors!(x, k, l, p, D, N)
-            end
-        end
-
     end
 
-    x
+    k,l = mod1(i-1,sampler.L), j;
+    if (state.x[k,l]==state.D)
+        if (rand() < sampler.p)
+            state.x[k,l] *=-1;
+            FlipNeighbors!(state.x, k, l, sampler.p, state.D, sampler.L)
+        end
+    end
+
+    k,l = i, mod1(j+1,sampler.L);
+    if (state.x[k,l]==state.D)
+        if (rand() < sampler.p)
+            state.x[k,l] *=-1;
+            FlipNeighbors!(state.x, k, l, sampler.p, state.D, sampler.L)
+        end
+    end
+
+    k,l = i, mod1(j-1,sampler.L);
+    if (state.x[k,l]==state.D)
+        if (rand() < sampler.p)
+            state.x[k,l] *=-1;
+            FlipNeighbors!(state.x, k, l, sampler.p, state.D, sampler.L)
+        end
+    end
+    state
 end
 
 """
@@ -135,41 +84,40 @@ square lattice Ising
 * `j` - j-coordinate of current spin
 * `p` - Flipping probability
 * `D` - Flipping direction
-* `N` - Lattice size, N×N
+* `L` - Lattice size, N×N
 """
-function FlipNeighbors!(x, i, j, p, D, N)
+function FlipNeighbors!(x, i, j, p, D, L)
 
-    k,l = mod1(i+1,N), j;
+    k,l = mod1(i+1,L), j;
     if (x[k,l]==D)
         if (rand() < p)
             x[k,l] *=-1;
-            FlipNeighbors!(x, k, l, p, D, N)
+            FlipNeighbors!(x, k, l, p, D, L)
         end
     end
 
-    k,l = mod1(i-1,N), j;
+    k,l = mod1(i-1,L), j;
     if (x[k,l]==D)
         if (rand() < p)
             x[k,l] *=-1;
-            FlipNeighbors!(x, k, l, p, D, N)
+            FlipNeighbors!(x, k, l, p, D, L)
         end
     end
 
-    k,l = i, mod1(j+1,N);
+    k,l = i, mod1(j+1,L);
     if (x[k,l]==D)
         if (rand() < p)
             x[k,l] *=-1;
-            FlipNeighbors!(x, k, l, p, D, N)
+            FlipNeighbors!(x, k, l, p, D, L)
         end
     end
 
-    k,l = i, mod1(j-1,N);
+    k,l = i, mod1(j-1,L);
     if (x[k,l]==D)
         if (rand() < p)
             x[k,l] *=-1;
-            FlipNeighbors!(x, k, l, p, D, N)
+            FlipNeighbors!(x, k, l, p, D, L)
         end
     end
-
     x
 end

@@ -4,20 +4,27 @@ using StaticArrays
 using Statistics
 using StatsBase
 
+# abstract types
+include("types.jl")
+
+# utility functions
+include("utils2d.jl")
+export RandomLattice, RandomMLattice, IsingOptions
+
+# abstract sampler
+include("sample.jl")
+export sample_trajectory!, sample_trajectory
+
 # observables, including energy
 include("Observables2D.jl")
 export Energy, Magnetization
 
-# utility functions
-include("Utils2d.jl")
-export RandomLattice, RandomMLattice, GetNeighbors!
-
 # spin flip sampler with Metropolis rates
 include("samplers/Metropolis2D.jl")
-export Metropolis, Metropolis!
+export Metropolis
 
 # Wolff sampler
 include("samplers/Wolff2D.jl")
-export Wolff, Wolff!
+export Wolff
 
 end # module end
