@@ -8,9 +8,10 @@ and Metropolis rates
 * `β` - Inverse temperature
 * `niters` - Number of iterations to run
 ### Optional Fields
-* 'J=1.0' - Coupling constant>0
+* `J = 1.0` - Coupling constant>0
+* `nsave_iters = 1` - Number of iterations between saves
 """
-function Metropolis(x0, β, niters; J=1.0)
+function Metropolis(x0, β, niters; J=1.0, nsave_iters=1)
 
     N = size(x0)[1];
     x = copy(x0);
@@ -46,7 +47,9 @@ function Metropolis(x0, β, niters; J=1.0)
             # restore state if rejected
             xp[i,j] *= -1;
         end
-        push!(x_trajectory,copy(x));
+        if(mod(n,nsave_iters) == 0)
+            push!(x_trajectory,copy(x));
+        end
     end
 
     return x_trajectory

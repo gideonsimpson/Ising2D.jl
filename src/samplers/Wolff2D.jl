@@ -6,9 +6,10 @@
 * `β` - Inverse temperature
 * `niters` - Number of iterations to run
 ### Optional Fields
-* 'J=1.0' - Coupling constant>0
+* 'J = 1.0' - Coupling constant>0
+* `nsave_iters = 1` - Number of iterations between saves
 """
-function Wolff(x0, β, niters; J = 1.0)
+function Wolff(x0, β, niters; J = 1.0, nsave_iters=1)
 
     p = 1 - exp(-2 * β * J);
 
@@ -55,8 +56,9 @@ function Wolff(x0, β, niters; J = 1.0)
                 FlipNeighbors!(x, k, l, p, D, N)
             end
         end
-
-        push!(x_trajectory,copy(x));
+        if(mod(n,nsave_iters) == 0)
+            push!(x_trajectory,copy(x));
+        end
     end
 
     return x_trajectory
