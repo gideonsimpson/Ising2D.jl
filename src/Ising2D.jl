@@ -1,8 +1,8 @@
 module Ising2D
 
-using StaticArrays
 using Statistics
 using StatsBase
+using Printf
 
 # abstract types
 include("types.jl")
@@ -13,7 +13,7 @@ export RandomLattice, RandomMLattice, IsingOptions
 
 # abstract sampler
 include("sample.jl")
-export sample_trajectory!, sample_trajectory
+export sample_trajectory!, sample_trajectory, sample_observables
 
 # observables, including energy
 include("Observables2D.jl")
