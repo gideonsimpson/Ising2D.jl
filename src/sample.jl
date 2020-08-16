@@ -63,26 +63,28 @@ the full trajectory.
 
 * `x`         - Starting position for sampler, modified in place
 * `sampler`   - Desired sampler
-* `observables` - An array of scalar valued observable functions
+* `observables` - A tuple of scalar valued observable functions
 * `options`   - Sampling options, including number of iteration
 
 """
-function sample_observables(x₀::Tx, sampler::S, observables::TOV; options=IsingOptions()) where {Tx,  S<:AbstractSampler,TO<:Function, TOV<:AbstractVector{TO}}
+@generated function sample_observables(x₀::Tx, sampler::S, observables::Tuple{Vararg{<:Function,NO}}; options=IsingOptions()) where {Tx,  S<:AbstractSampler, NO}
 
-    state = InitState(x₀, sampler);
+    quote
+        state = InitState(x₀, sampler);
 
-    n_obs = length(observables);
-    # allocate memory for samples
-    observable_samples = zeros(n_obs, options.n_save);
-    save_index = 1;
-    for n = 1:options.n_iters
-        UpdateState!(state, sampler);
-        if(mod(n,options.n_save_iters)==0)
-            for k in 1:n_obs
-                observable_samples[k,save_index] = observables[k](state.x);
+        # allocate memory for samples
+        observable_samples = zeros($NO, options.n_save);
+        save_index = 1;
+        for n = 1:options.n_iters
+            UpdateState!(state, sampler);
+            if(mod(n,options.n_save_iters)==0)
+                Base.Cartesian.@nexprs $NO k -> observable_samples[k,save_index] = (observables[k])(state.x);
+                # for k in 1:n_obs
+                #     observable_samples[k,save_index] = observables[k](state.x);
+                # end
+                save_index+=1;
             end
-            save_index+=1;
         end
+        return observable_samples
     end
-    return observable_samples
 end
