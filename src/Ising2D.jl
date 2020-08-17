@@ -8,7 +8,7 @@ using Printf
 include("types.jl")
 
 # utility functions
-include("utils2d.jl")
+include("utils2D.jl")
 export RandomLattice, RandomMLattice, IsingOptions
 
 # abstract sampler
