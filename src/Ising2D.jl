@@ -17,7 +17,7 @@ export sample_trajectory!, sample_trajectory, sample_observables
 
 # observables, including energy
 include("Observables2D.jl")
-export Energy, Magnetization
+export Energy, Magnetization, Clusters
 
 # spin flip sampler with Metropolis rates
 include("samplers/Metropolis2D.jl")
