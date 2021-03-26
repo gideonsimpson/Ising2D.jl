@@ -1,0 +1,12 @@
+name = "Ising2D"
+uuid = "7b62effa-9695-4d1a-887c-5663e4666603"
+authors = ["Gideon Simpson <gideon.simpson@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
+StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
+
+[compat]
+julia = "1.5, 1.6"

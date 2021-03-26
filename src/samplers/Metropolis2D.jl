@@ -1,10 +1,4 @@
 
-struct Metropolis{TF<:AbstractFloat, TI<:Integer} <:AbstractSampler
-    β::TF
-    J::TF
-    L::TI
-end
-
 """
     `Metropolis(β, J, L)` - Set up the Metropolis sampler
 
@@ -13,10 +7,11 @@ end
 * `J` - Coupling constant>0    
 * `L` - Lattice size, L×L
 """
-function Metropolis(β::TF, J::TF, L::TI) where{TF<:AbstractFloat, TI<:Integer}
-    return Metropolis{TF, TI}(β, J, L)
+struct Metropolis{TF<:AbstractFloat, TI<:Integer} <:AbstractSampler
+    β::TF
+    J::TF
+    L::TI
 end
-
 mutable struct MetropolisState{TI<:Integer, Tx<:AbstractArray{TI}} <:AbstractSamplerState
     x::Tx
     x_proposal::Tx

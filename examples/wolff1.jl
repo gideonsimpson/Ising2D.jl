@@ -4,7 +4,6 @@ using Random
 using Printf
 using Statistics
 
-push!(LOAD_PATH,"../src/")
 using Ising2D
 
 # Set lattice size, temperature, and number of iterations
